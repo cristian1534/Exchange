@@ -1,4 +1,5 @@
 import MiniChart from "./components/MiniChart";
+import Image from "next/image";
 
 type ExchangeRate = {
   cc: string;
@@ -182,9 +183,11 @@ export default async function Home() {
             {/* User Avatar */}
             <div className="mb-4 sm:mb-6">
               <div className="relative inline-block">
-                <img
+                <Image
                   src="https://res.cloudinary.com/dutafv5us/image/upload/v1774036390/Olena_q4odq0.jpg"
                   alt="Princess Olena"
+                  width={112}
+                  height={112}
                   className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-full border-4 border-pink-300 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                 />
                 <div className="absolute bottom-0 right-0 w-6 h-6 sm:w-7 sm:h-7 bg-green-400 rounded-full border-3 border-white animate-pulse"></div>
