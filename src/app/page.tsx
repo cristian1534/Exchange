@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import MiniChart from "./components/MiniChart";
 
 type ExchangeRate = {
@@ -18,34 +18,47 @@ export default function Home() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Using Minfin.com.ua API - reliable Ukrainian financial data source
-        const response = await fetch(
-          "https://api.minfin.com.ua/mb/demo/2026-03-20/",
-          {
-            cache: "no-store",
-          },
-        );
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+
+        // Try the API first
+        let exchangeData: ExchangeRate[] = [];
+
+        try {
+          const response = await fetch(
+            "https://api.minfin.com.ua/mb/demo/2026-03-20/",
+            {
+              cache: "no-store",
+              mode: "cors",
+            },
+          );
+
+          if (response.ok) {
+            const apiData = await response.json();
+            exchangeData = [
+              {
+                cc: "USD",
+                rate: apiData?.date?.sale || 43.6,
+              },
+            ];
+          } else {
+            throw new Error("API not responding");
+          }
+        } catch (apiError) {
+          console.warn("API failed, using fallback:", apiError);
+          // Use fallback data immediately
+          exchangeData = [
+            {
+              cc: "USD",
+              rate: 43.6,
+            },
+          ];
         }
-        
-        const apiData = await response.json();
-        
-        // Transform the API data to our ExchangeRate format
-        const exchangeData: ExchangeRate[] = [
-          {
-            cc: "USD",
-            rate: apiData?.date?.sale || 43.6, // Fallback to 43.6 if API fails
-          },
-        ];
-        
+
         setData(exchangeData);
         setCurrentTime(new Date().toLocaleTimeString());
         setError(null);
       } catch (err) {
-        console.error("Error fetching data:", err);
-        setError("Failed to fetch exchange rates");
+        console.error("General error:", err);
+        setError("Using fallback rate");
         // Set fallback data
         setData([
           {
@@ -67,14 +80,25 @@ export default function Home() {
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex flex-col items-center justify-center p-4 sm:p-4 lg:p-8 relative overflow-hidden">
         {/* Flower Background Pattern */}
         <div className="absolute inset-0 opacity-40">
-          <div className="absolute top-10 left-10 text-4xl animate-pulse">🌸</div>
-          <div className="absolute top-20 right-20 text-3xl animate-pulse" style={{ animationDelay: "0.5s" }}>
+          <div className="absolute top-10 left-10 text-4xl animate-pulse">
+            🌸
+          </div>
+          <div
+            className="absolute top-20 right-20 text-3xl animate-pulse"
+            style={{ animationDelay: "0.5s" }}
+          >
             🌺
           </div>
-          <div className="absolute top-40 left-1/4 text-5xl animate-pulse" style={{ animationDelay: "1s" }}>
+          <div
+            className="absolute top-40 left-1/4 text-5xl animate-pulse"
+            style={{ animationDelay: "1s" }}
+          >
             🌷
           </div>
-          <div className="absolute top-60 right-1/3 text-4xl animate-pulse" style={{ animationDelay: "1.5s" }}>
+          <div
+            className="absolute top-60 right-1/3 text-4xl animate-pulse"
+            style={{ animationDelay: "1.5s" }}
+          >
             🌹
           </div>
         </div>
@@ -94,57 +118,108 @@ export default function Home() {
       {/* Flower Background Pattern */}
       <div className="absolute inset-0 opacity-40">
         <div className="absolute top-10 left-10 text-4xl animate-pulse">🌸</div>
-        <div className="absolute top-20 right-20 text-3xl animate-pulse" style={{ animationDelay: "0.5s" }}>
+        <div
+          className="absolute top-20 right-20 text-3xl animate-pulse"
+          style={{ animationDelay: "0.5s" }}
+        >
           🌺
         </div>
-        <div className="absolute top-40 left-1/4 text-5xl animate-pulse" style={{ animationDelay: "1s" }}>
+        <div
+          className="absolute top-40 left-1/4 text-5xl animate-pulse"
+          style={{ animationDelay: "1s" }}
+        >
           🌷
         </div>
-        <div className="absolute top-60 right-1/3 text-4xl animate-pulse" style={{ animationDelay: "1.5s" }}>
+        <div
+          className="absolute top-60 right-1/3 text-4xl animate-pulse"
+          style={{ animationDelay: "1.5s" }}
+        >
           🌹
         </div>
-        <div className="absolute top-80 left-20 text-3xl animate-pulse" style={{ animationDelay: "2s" }}>
+        <div
+          className="absolute top-80 left-20 text-3xl animate-pulse"
+          style={{ animationDelay: "2s" }}
+        >
           🌸
         </div>
-        <div className="absolute top-32 right-10 text-4xl animate-pulse" style={{ animationDelay: "2.5s" }}>
+        <div
+          className="absolute top-32 right-10 text-4xl animate-pulse"
+          style={{ animationDelay: "2.5s" }}
+        >
           🌺
         </div>
-        <div className="absolute top-52 left-1/3 text-3xl animate-pulse" style={{ animationDelay: "3s" }}>
+        <div
+          className="absolute top-52 left-1/3 text-3xl animate-pulse"
+          style={{ animationDelay: "3s" }}
+        >
           🌷
         </div>
-        <div className="absolute top-72 right-20 text-5xl animate-pulse" style={{ animationDelay: "3.5s" }}>
+        <div
+          className="absolute top-72 right-20 text-5xl animate-pulse"
+          style={{ animationDelay: "3.5s" }}
+        >
           🌹
         </div>
 
-        <div className="absolute top-1/3 left-10 text-4xl animate-pulse" style={{ animationDelay: "4s" }}>
+        <div
+          className="absolute top-1/3 left-10 text-4xl animate-pulse"
+          style={{ animationDelay: "4s" }}
+        >
           🌸
         </div>
-        <div className="absolute top-1/2 right-10 text-3xl animate-pulse" style={{ animationDelay: "4.5s" }}>
+        <div
+          className="absolute top-1/2 right-10 text-3xl animate-pulse"
+          style={{ animationDelay: "4.5s" }}
+        >
           🌺
         </div>
-        <div className="absolute top-2/3 left-20 text-5xl animate-pulse" style={{ animationDelay: "5s" }}>
+        <div
+          className="absolute top-2/3 left-20 text-5xl animate-pulse"
+          style={{ animationDelay: "5s" }}
+        >
           🌷
         </div>
-        <div className="absolute top-3/4 right-1/4 text-4xl animate-pulse" style={{ animationDelay: "5.5s" }}>
+        <div
+          className="absolute top-3/4 right-1/4 text-4xl animate-pulse"
+          style={{ animationDelay: "5.5s" }}
+        >
           🌹
         </div>
 
-        <div className="absolute bottom-20 left-10 text-3xl animate-pulse" style={{ animationDelay: "6s" }}>
+        <div
+          className="absolute bottom-20 left-10 text-3xl animate-pulse"
+          style={{ animationDelay: "6s" }}
+        >
           🌸
         </div>
-        <div className="absolute bottom-32 right-20 text-4xl animate-pulse" style={{ animationDelay: "6.5s" }}>
+        <div
+          className="absolute bottom-32 right-20 text-4xl animate-pulse"
+          style={{ animationDelay: "6.5s" }}
+        >
           🌺
         </div>
-        <div className="absolute bottom-40 left-1/3 text-5xl animate-pulse" style={{ animationDelay: "7s" }}>
+        <div
+          className="absolute bottom-40 left-1/3 text-5xl animate-pulse"
+          style={{ animationDelay: "7s" }}
+        >
           🌷
         </div>
-        <div className="absolute bottom-52 right-10 text-3xl animate-pulse" style={{ animationDelay: "7.5s" }}>
+        <div
+          className="absolute bottom-52 right-10 text-3xl animate-pulse"
+          style={{ animationDelay: "7.5s" }}
+        >
           🌹
         </div>
-        <div className="absolute bottom-64 left-20 text-4xl animate-pulse" style={{ animationDelay: "8s" }}>
+        <div
+          className="absolute bottom-64 left-20 text-4xl animate-pulse"
+          style={{ animationDelay: "8s" }}
+        >
           🌸
         </div>
-        <div className="absolute bottom-10 right-1/3 text-3xl animate-pulse" style={{ animationDelay: "8.5s" }}>
+        <div
+          className="absolute bottom-10 right-1/3 text-3xl animate-pulse"
+          style={{ animationDelay: "8.5s" }}
+        >
           🌺
         </div>
       </div>
@@ -163,7 +238,7 @@ export default function Home() {
             {/* User Avatar */}
             <div className="mb-4 sm:mb-6">
               <div className="relative inline-block">
-                <img 
+                <img
                   src="https://res.cloudinary.com/dutafv5us/image/upload/v1774036390/Olena_q4odq0.jpg"
                   alt="Princess Olena"
                   className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-full border-4 border-pink-300 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
@@ -182,8 +257,12 @@ export default function Home() {
               Current USD to UAH rate (Ukrainian market):
             </p>
             <div className="inline-flex items-center bg-white/80 backdrop-blur-sm border-2 border-pink-200 rounded-xl sm:rounded-2xl px-3 sm:px-4 lg:px-6 py-2 sm:py-3 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
-              <span className="text-xs sm:text-sm lg:text-base text-gray-600 mr-2">⏰</span>
-              <span className="text-xs sm:text-sm lg:text-base text-gray-800 font-medium">{currentTime}</span>
+              <span className="text-xs sm:text-sm lg:text-base text-gray-600 mr-2">
+                ⏰
+              </span>
+              <span className="text-xs sm:text-sm lg:text-base text-gray-800 font-medium">
+                {currentTime}
+              </span>
             </div>
           </header>
 
@@ -230,7 +309,7 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Mini Chart */}
                   <div className="mt-4 sm:mt-6">
                     <MiniChart currentRate={exchange.rate} />
