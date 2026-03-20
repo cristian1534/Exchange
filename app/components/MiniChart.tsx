@@ -9,6 +9,9 @@ const MiniChart = ({ currentRate }: { currentRate: number }) => {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === "undefined") return;
+
     setIsClient(true);
 
     // Get or create mock data for demonstration
@@ -86,6 +89,7 @@ const MiniChart = ({ currentRate }: { currentRate: number }) => {
     setHistory(updatedHistory);
   }, [currentRate]);
 
+  // Show loading state during SSR or initial client render
   if (!isClient || history.length < 2) {
     return (
       <div className="w-full h-20 bg-gray-50 rounded-lg flex items-center justify-center text-gray-400 text-xs">
