@@ -14,83 +14,51 @@ const MiniChart = ({ currentRate }: { currentRate: number }) => {
 
     setIsClient(true);
 
-    // Get or create mock data for demonstration
-    let storedHistory: HistoryPoint[] = [];
-    const historyStr = localStorage.getItem("usd_uah_rate_history");
-
-    if (historyStr) {
-      storedHistory = JSON.parse(historyStr);
-    } else {
-      // Create mock historical data for the last 3 days
-      const now = new Date();
-      const mockData = [
-        {
-          rate: 43.25,
-          timestamp: new Date(
-            now.getTime() - 3 * 24 * 60 * 60 * 1000,
-          ).toISOString(),
-        }, // 3 days ago
-        {
-          rate: 43.4,
-          timestamp: new Date(
-            now.getTime() - 2 * 24 * 60 * 60 * 1000,
-          ).toISOString(),
-        }, // 2 days ago
-        {
-          rate: 43.55,
-          timestamp: new Date(
-            now.getTime() - 1 * 24 * 60 * 60 * 1000,
-          ).toISOString(),
-        }, // 1 day ago
-        {
-          rate: 43.48,
-          timestamp: new Date(
-            now.getTime() - 12 * 60 * 60 * 1000,
-          ).toISOString(),
-        }, // 12 hours ago
-        {
-          rate: 43.52,
-          timestamp: new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString(),
-        }, // 6 hours ago
-        {
-          rate: 43.58,
-          timestamp: new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString(),
-        }, // 3 hours ago
-        {
-          rate: 43.62,
-          timestamp: new Date(now.getTime() - 1 * 60 * 60 * 1000).toISOString(),
-        }, // 1 hour ago
-      ];
-      storedHistory = mockData;
-    }
-
-    // Add current rate to history
-    const updatedHistory = [
-      ...storedHistory,
+    // Create mock data immediately to prevent hanging
+    const now = new Date();
+    const mockData = [
       {
-        rate: currentRate,
-        timestamp: new Date().toISOString(),
+        rate: 43.25,
+        timestamp: new Date(
+          now.getTime() - 3 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
       },
+      {
+        rate: 43.4,
+        timestamp: new Date(
+          now.getTime() - 2 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
+      },
+      {
+        rate: 43.55,
+        timestamp: new Date(
+          now.getTime() - 1 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
+      },
+      {
+        rate: 43.48,
+        timestamp: new Date(now.getTime() - 12 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        rate: 43.52,
+        timestamp: new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        rate: 43.58,
+        timestamp: new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        rate: 43.62,
+        timestamp: new Date(now.getTime() - 1 * 60 * 60 * 1000).toISOString(),
+      },
+      { rate: currentRate, timestamp: new Date().toISOString() },
     ];
 
-    // Keep only last 20 data points
-    if (updatedHistory.length > 20) {
-      updatedHistory.splice(0, updatedHistory.length - 20);
-    }
-
-    // Save updated history
-    localStorage.setItem(
-      "usd_uah_rate_history",
-      JSON.stringify(updatedHistory),
-    );
-    localStorage.setItem("usd_uah_previous_rate", currentRate.toString());
-    localStorage.setItem("usd_uah_last_update", new Date().toISOString());
-
-    setHistory(updatedHistory);
+    setHistory(mockData);
   }, [currentRate]);
 
   // Show loading state during SSR or initial client render
-  if (!isClient || history.length < 2) {
+  if (!isClient || history.length === 0) {
     return (
       <div className="w-full h-20 bg-gray-50 rounded-lg flex items-center justify-center text-gray-400 text-xs">
         Loading chart data...
