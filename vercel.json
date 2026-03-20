@@ -1,9 +1,6 @@
 {
   "buildCommand": "npm run build",
   "framework": "nextjs",
-  "buildEnv": {
-    "NEXT_TELEMETRY_DISABLED": "1"
-  },
   "functions": {
     "app/**/*.ts": {
       "maxDuration": 10
