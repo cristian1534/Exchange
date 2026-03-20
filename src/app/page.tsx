@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from 'react';
 import MiniChart from "./components/MiniChart";
 
 type ExchangeRate = {
@@ -5,165 +8,143 @@ type ExchangeRate = {
   rate: number;
 };
 
-const fetchData = async () => {
-  try {
-    // Using Minfin.com.ua API - reliable Ukrainian financial data source
-    // Note: You'll need to get an API key from https://minfin.com.ua/en/developers/api/
-    // For now, using a demo endpoint to show the structure
-    const response = await fetch(
-      "https://api.minfin.com.ua/mb/demo/2026-03-20/",
-      {
-        cache: "no-store",
-      },
+export default function Home() {
+  const [data, setData] = useState<ExchangeRate[]>([]);
+  const [currentTime, setCurrentTime] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        // Using Minfin.com.ua API - reliable Ukrainian financial data source
+        const response = await fetch(
+          "https://api.minfin.com.ua/mb/demo/2026-03-20/",
+          {
+            cache: "no-store",
+          },
+        );
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const apiData = await response.json();
+        
+        // Transform the API data to our ExchangeRate format
+        const exchangeData: ExchangeRate[] = [
+          {
+            cc: "USD",
+            rate: apiData?.date?.sale || 43.6, // Fallback to 43.6 if API fails
+          },
+        ];
+        
+        setData(exchangeData);
+        setCurrentTime(new Date().toLocaleTimeString());
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("Failed to fetch exchange rates");
+        // Set fallback data
+        setData([
+          {
+            cc: "USD",
+            rate: 43.6,
+          },
+        ]);
+        setCurrentTime(new Date().toLocaleTimeString());
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex flex-col items-center justify-center p-4 sm:p-4 lg:p-8 relative overflow-hidden">
+        {/* Flower Background Pattern */}
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute top-10 left-10 text-4xl animate-pulse">🌸</div>
+          <div className="absolute top-20 right-20 text-3xl animate-pulse" style={{ animationDelay: "0.5s" }}>
+            🌺
+          </div>
+          <div className="absolute top-40 left-1/4 text-5xl animate-pulse" style={{ animationDelay: "1s" }}>
+            🌷
+          </div>
+          <div className="absolute top-60 right-1/3 text-4xl animate-pulse" style={{ animationDelay: "1.5s" }}>
+            🌹
+          </div>
+        </div>
+
+        <div className="relative z-10 flex flex-col items-center justify-center">
+          <div className="text-6xl animate-pulse mb-4">⏳</div>
+          <div className="text-sm sm:text-base lg:text-lg font-medium text-yellow-600">
+            Loading exchange rates...
+          </div>
+        </div>
+      </div>
     );
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    const currentTime = new Date().toLocaleTimeString();
-    const currentRate = parseFloat(data.ask) || 43.6;
-
-    // Transform the data to match our expected format
-    const exchangeData = [
-      {
-        cc: "USD",
-        rate: currentRate,
-      },
-    ];
-
-    return {
-      props: exchangeData,
-      currentTime,
-      error: null,
-    };
-  } catch {
-    // Fallback to a realistic rate for Odessa market
-    const fallbackRate = 43.6;
-    const currentTime = new Date().toLocaleTimeString();
-
-    return {
-      props: [
-        {
-          cc: "USD",
-          rate: fallbackRate,
-        },
-      ],
-      currentTime,
-      error: null,
-    };
   }
-};
-
-export default async function Home() {
-  const { props: data, currentTime, error } = await fetchData();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 relative overflow-hidden">
       {/* Flower Background Pattern */}
       <div className="absolute inset-0 opacity-40">
         <div className="absolute top-10 left-10 text-4xl animate-pulse">🌸</div>
-        <div
-          className="absolute top-20 right-20 text-3xl animate-pulse"
-          style={{ animationDelay: "0.5s" }}
-        >
+        <div className="absolute top-20 right-20 text-3xl animate-pulse" style={{ animationDelay: "0.5s" }}>
           🌺
         </div>
-        <div
-          className="absolute top-40 left-1/4 text-5xl animate-pulse"
-          style={{ animationDelay: "1s" }}
-        >
+        <div className="absolute top-40 left-1/4 text-5xl animate-pulse" style={{ animationDelay: "1s" }}>
           🌷
         </div>
-        <div
-          className="absolute top-60 right-1/3 text-4xl animate-pulse"
-          style={{ animationDelay: "1.5s" }}
-        >
+        <div className="absolute top-60 right-1/3 text-4xl animate-pulse" style={{ animationDelay: "1.5s" }}>
           🌹
         </div>
-        <div
-          className="absolute top-80 left-20 text-3xl animate-pulse"
-          style={{ animationDelay: "2s" }}
-        >
+        <div className="absolute top-80 left-20 text-3xl animate-pulse" style={{ animationDelay: "2s" }}>
           🌸
         </div>
-        <div
-          className="absolute top-32 right-10 text-4xl animate-pulse"
-          style={{ animationDelay: "2.5s" }}
-        >
+        <div className="absolute top-32 right-10 text-4xl animate-pulse" style={{ animationDelay: "2.5s" }}>
           🌺
         </div>
-        <div
-          className="absolute top-52 left-1/3 text-3xl animate-pulse"
-          style={{ animationDelay: "3s" }}
-        >
+        <div className="absolute top-52 left-1/3 text-3xl animate-pulse" style={{ animationDelay: "3s" }}>
           🌷
         </div>
-        <div
-          className="absolute top-72 right-20 text-5xl animate-pulse"
-          style={{ animationDelay: "3.5s" }}
-        >
+        <div className="absolute top-72 right-20 text-5xl animate-pulse" style={{ animationDelay: "3.5s" }}>
           🌹
         </div>
 
-        <div
-          className="absolute top-1/3 left-10 text-4xl animate-pulse"
-          style={{ animationDelay: "4s" }}
-        >
+        <div className="absolute top-1/3 left-10 text-4xl animate-pulse" style={{ animationDelay: "4s" }}>
           🌸
         </div>
-        <div
-          className="absolute top-1/2 right-10 text-3xl animate-pulse"
-          style={{ animationDelay: "4.5s" }}
-        >
+        <div className="absolute top-1/2 right-10 text-3xl animate-pulse" style={{ animationDelay: "4.5s" }}>
           🌺
         </div>
-        <div
-          className="absolute top-2/3 left-20 text-5xl animate-pulse"
-          style={{ animationDelay: "5s" }}
-        >
+        <div className="absolute top-2/3 left-20 text-5xl animate-pulse" style={{ animationDelay: "5s" }}>
           🌷
         </div>
-        <div
-          className="absolute top-3/4 right-1/4 text-4xl animate-pulse"
-          style={{ animationDelay: "5.5s" }}
-        >
+        <div className="absolute top-3/4 right-1/4 text-4xl animate-pulse" style={{ animationDelay: "5.5s" }}>
           🌹
         </div>
 
-        <div
-          className="absolute bottom-20 left-10 text-3xl animate-pulse"
-          style={{ animationDelay: "6s" }}
-        >
+        <div className="absolute bottom-20 left-10 text-3xl animate-pulse" style={{ animationDelay: "6s" }}>
           🌸
         </div>
-        <div
-          className="absolute bottom-32 right-20 text-4xl animate-pulse"
-          style={{ animationDelay: "6.5s" }}
-        >
+        <div className="absolute bottom-32 right-20 text-4xl animate-pulse" style={{ animationDelay: "6.5s" }}>
           🌺
         </div>
-        <div
-          className="absolute bottom-40 left-1/3 text-5xl animate-pulse"
-          style={{ animationDelay: "7s" }}
-        >
+        <div className="absolute bottom-40 left-1/3 text-5xl animate-pulse" style={{ animationDelay: "7s" }}>
           🌷
         </div>
-        <div
-          className="absolute bottom-52 right-10 text-3xl animate-pulse"
-          style={{ animationDelay: "7.5s" }}
-        >
+        <div className="absolute bottom-52 right-10 text-3xl animate-pulse" style={{ animationDelay: "7.5s" }}>
           🌹
         </div>
-        <div
-          className="absolute bottom-64 left-20 text-4xl animate-pulse"
-          style={{ animationDelay: "8s" }}
-        >
+        <div className="absolute bottom-64 left-20 text-4xl animate-pulse" style={{ animationDelay: "8s" }}>
           🌸
         </div>
-        <div
-          className="absolute bottom-10 right-1/3 text-3xl animate-pulse"
-          style={{ animationDelay: "8.5s" }}
-        >
+        <div className="absolute bottom-10 right-1/3 text-3xl animate-pulse" style={{ animationDelay: "8.5s" }}>
           🌺
         </div>
       </div>
@@ -182,7 +163,7 @@ export default async function Home() {
             {/* User Avatar */}
             <div className="mb-4 sm:mb-6">
               <div className="relative inline-block">
-                <img
+                <img 
                   src="https://res.cloudinary.com/dutafv5us/image/upload/v1774036390/Olena_q4odq0.jpg"
                   alt="Princess Olena"
                   className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-full border-4 border-pink-300 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
@@ -201,31 +182,23 @@ export default async function Home() {
               Current USD to UAH rate (Ukrainian market):
             </p>
             <div className="inline-flex items-center bg-white/80 backdrop-blur-sm border-2 border-pink-200 rounded-xl sm:rounded-2xl px-3 sm:px-4 lg:px-6 py-2 sm:py-3 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
-              <span className="text-pink-500 mr-1 sm:mr-2 text-sm sm:text-base">
-                ⏰
-              </span>
-              <span className="text-xs sm:text-sm lg:text-base font-medium text-gray-800">
-                {currentTime}
-              </span>
+              <span className="text-xs sm:text-sm lg:text-base text-gray-600 mr-2">⏰</span>
+              <span className="text-xs sm:text-sm lg:text-base text-gray-800 font-medium">{currentTime}</span>
             </div>
           </header>
 
           {/* Content */}
-          <div className="space-y-4 sm:space-y-6">
+          <div className="grid gap-6 w-full max-w-lg">
             {error ? (
-              <div className="bg-red-50 border-2 border-red-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center">
-                <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">😔</div>
-                <div className="text-sm sm:text-base lg:text-lg font-medium text-red-600">
-                  {error}
+              <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg">
+                <div className="flex items-center mb-2">
+                  <span className="text-2xl sm:text-3xl mr-3">⚠️</span>
+                  <span className="text-sm sm:text-base lg:text-lg font-medium text-yellow-600">
+                    {error}
+                  </span>
                 </div>
-              </div>
-            ) : data.length === 0 ? (
-              <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center">
-                <div className="text-2xl sm:text-3xl mb-2 sm:mb-3 animate-spin">
-                  ⏳
-                </div>
-                <div className="text-sm sm:text-base lg:text-lg font-medium text-yellow-600">
-                  Loading exchange rates...
+                <div className="text-xs sm:text-sm text-gray-600">
+                  Using fallback rate...
                 </div>
               </div>
             ) : (
@@ -248,18 +221,18 @@ export default async function Home() {
                         </div>
                       </div>
                     </div>
-                    <div className="text-center sm:text-right">
-                      <div className="text-xs sm:text-sm text-gray-600 font-medium">
+                    <div className="text-right">
+                      <div className="text-xs sm:text-sm text-gray-600 font-medium mb-1">
                         Rate (UAH)
                       </div>
-                      <div className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                        {exchange.rate.toFixed(2)}
+                      <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-pink-600 group-hover:scale-105 transition-transform duration-300">
+                        {exchange.rate}
                       </div>
                     </div>
                   </div>
-
-                  {/* Mini Chart - Client Side Component */}
-                  <div className="mt-4 pt-4 border-t border-pink-100">
+                  
+                  {/* Mini Chart */}
+                  <div className="mt-4 sm:mt-6">
                     <MiniChart currentRate={exchange.rate} />
                   </div>
                 </div>
@@ -268,7 +241,7 @@ export default async function Home() {
           </div>
 
           {/* Footer */}
-          <footer className="mt-8 sm:mt-12 lg:mt-16 text-center">
+          <footer className="mt-8 sm:mt-12 text-center">
             <div className="inline-flex items-center bg-white/60 backdrop-blur-sm border-2 border-pink-200 rounded-full px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 shadow-lg">
               <span className="text-sm sm:text-base lg:text-lg font-medium bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
                 With love from Cristian and Jasmine 💖
